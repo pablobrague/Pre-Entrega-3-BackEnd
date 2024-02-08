@@ -1,9 +1,10 @@
 // controlador.js
 
-import { UserDAO } from '../dao/userDao.js';
+import { usersDao } from '../dao/indexDao.js';
 import { appendJwtAsCookie } from './authenticationControl.js';
 import { adminsOnly, usersOnly } from '../middlewares/authorization.js';
 import passport from 'passport';
+import { UserDTO } from '../dto/userDto.js';
 
 export const registerUser = async (req, res, next) => {
   try {
@@ -12,6 +13,7 @@ export const registerUser = async (req, res, next) => {
       session: false
     })(req, res, async () => {
       appendJwtAsCookie(req, res, () => {
+        
         res['successfullPost'](req.user);
       });
     });
@@ -26,9 +28,10 @@ export const getCurrentUser = async (req, res, next) => {
       failWithError: true,
       session: false
     })(req, res, async () => {
+      const userDTO = new UserDTO(req.user)
      
       usersOnly(req, res, () => {
-        res['successfullGet'](req.user);
+        res['successfullGet'](userDTO);
       });
     });
   } catch (error) {
@@ -43,7 +46,7 @@ export const getAllUsers = async (req, res, next) => {
       session: false
     })(req, res, async () => {
       adminsOnly(req, res, async () => {
-        const usuarios = await UserDAO.findAllUsers();
+        const usuarios = await usersDao.findAllUsers();
         res['successfullGet'](usuarios);
       });
     });

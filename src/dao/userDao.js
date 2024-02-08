@@ -1,9 +1,9 @@
-import { usersManager } from "../models/mongoose/User.js";
+import { usersManager } from "../models/index.js";
 import { hashear, hasheadasSonIguales } from "../utils/cryptografia.js";
 
-export class UserDAO {
+export class UserDao {
 
-    static createUser = async (userData) => {
+    async createUser(userData) {
         try {
           userData.password = hashear(userData.password)
           const user = await usersManager.create(userData)
@@ -12,8 +12,14 @@ export class UserDAO {
           throw new Error('Error creating user');
         }
       };
+
+      async readOne(criteria) {
+        const result = await usersManager.findOne(criteria).lean()
+        if (!result) throw new Error('NOT FOUND')
+        return result
+      }
     
-      static findUserByUsername = async ({username, password}) => {
+      async findUserByUsername({username, password}) {
         try {
             const user = await usersManager.findOne({ username })
             if (!user) { throw new Error('authentication error') }
@@ -29,7 +35,7 @@ export class UserDAO {
         }
       };
     
-      static findAllUsers = async () => {
+      async findAllUsers() {
         try {
           return await usersManager.find({}, { password: 0 }).lean();
         } catch (error) {

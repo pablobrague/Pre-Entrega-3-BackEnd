@@ -1,4 +1,5 @@
-import { TicketDao } from '../dao/ticketDao.js'
+import { ticketDao } from '../dao/indexDao.js';
+
 
 export class TicketService {
   static async generateTicket(code, purchaseDatetime, amount, purchaser) {
@@ -9,8 +10,10 @@ export class TicketService {
         amount,
         purchaser,
       };
-      const newTicket = await TicketDao.createTicket(ticketData)
+      const newTicket = await ticketDao.createTicket(ticketData)
+
       return newTicket;
+
     } catch (error) {
       console.error(error);
       throw new Error('Error generating ticket');
